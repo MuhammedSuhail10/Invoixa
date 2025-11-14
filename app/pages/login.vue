@@ -27,7 +27,7 @@ const login = async () => {
     <div class="flex h-[100dvh] flex-col justify-center items-center bg-[#023047] text-white">
         <img src="/icon.png" alt="" class="w-[10em] h-[10em] mx-auto" />
         <p class="text-[15pt] ">Make your billing easier</p>
-        <form @submit.prevent="login" class="my-[3em] ">
+        <form @submit.prevent="login" class="my-[3em] px-[1em] ">
             <div>
                 <label class="font-[500] text-[#6c757d]">Phone Number</label>
                 <input class="w-full border p-[0.7em] py-[1em] rounded-[1em] outline-none" type="text"
