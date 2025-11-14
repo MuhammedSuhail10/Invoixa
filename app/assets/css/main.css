@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: sansation;
+  font-display: swap;
+  src: url('../fonts/Sansation.ttf');
+}
+
+@font-face {
+  font-family: poppins;
+  font-display: swap;
+  src: url('../fonts/Poppins.ttf');
+}
