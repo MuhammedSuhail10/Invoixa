@@ -1,5 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { getVendor } from "~/services/customer";
+import { getProduct } from "~/services/product";
+import { createSale } from "~/services/sale";
 const emit = defineEmits(["close", "success"]);
 const customer = ref("");
 const transportCharge = ref(0);
@@ -8,24 +11,38 @@ const newProduct = ref("");
 const newQty = ref(1);
 const productsList = ref([]);
 const isSubmitting = ref(false);
-const isVendor = ref(true);
+
+const customers = ref([]);
+const products = ref([]);
 
 const errors = ref({
     customer: "",
     products: "",
 });
 
+onMounted(async () => {
+    try {
+        const customerResult = await getVendor();
+        customers.value = customerResult.data;
+
+        const productResult = await getProduct();
+        products.value = productResult.data;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+});
+
 function addProduct() {
     if (!newProduct.value || !newQty.value) return;
     const exists = productsList.value.find(
-        p => p.name === newProduct.value
+        p => p.id === newProduct.value
     );
     if (exists) {
         exists.qty += Number(newQty.value);
     } else {
         productsList.value.push({
-            name: newProduct.value,
-            qty: Number(newQty.value)
+            item_id: newProduct.value,
+            quantity: Number(newQty.value)
         });
     }
     newProduct.value = "";
@@ -34,6 +51,11 @@ function addProduct() {
 
 function removeProduct(index) {
     productsList.value.splice(index, 1);
+}
+
+function getProductName(id) {
+    const product = products.value.find(p => p.id === id);
+    return product ? product.name : id;
 }
 
 function validateForm() {
@@ -56,21 +78,24 @@ function validateForm() {
     return isValid;
 }
 
-async function createSale() {
+async function saleCreation() {
     if (!validateForm()) return;
     isSubmitting.value = true;
 
     const formData = {
         customer_id: customer.value,
         order_items: productsList.value,
-        transport_charge: transportCharge.value,
-        include_tc_to_gst: includeTcToGst.value,
+        include_tc_gst: includeTcToGst.value,
+        transport_charges: transportCharge.value,
+        sale_type: false,
     };
-
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const success = true;
-        if (success) {
+        const { data, error } = await createSale(formData);
+        if (error) {
+            alert(error);
+            return;
+        }
+        if (data) {
             customer.value = "";
             transportCharge.value = 0;
             includeTcToGst.value = false;
@@ -101,7 +126,7 @@ function closeForm() {
             <button @click="closeForm" class="close-btn">✕</button>
         </div>
 
-        <form @submit.prevent="createSale">
+        <form @submit.prevent="saleCreation">
             <div class="mb-2 flex flex-col gap-1">
                 <label class="font-[500] text-[#6c757d] ">Vendor</label>
                 <div class="flex w-[100%] gap-2">
@@ -109,8 +134,8 @@ function closeForm() {
                     focus:outline-none focus:border-blue-500" v-model="customer" :class="{ 'error': errors.customer }"
                         :disabled="isSubmitting">
                         <option value="" disabled>Select Vendor</option>
-                        <option v-for="customer in 10" :key="customer.id" :value="customer.id">
-                            {{ customer.name }}
+                        <option v-for="cust in customers" :key="cust.id" :value="cust.id">
+                            {{ cust.name }}
                         </option>
                     </select>
                     <!-- <button
@@ -125,19 +150,18 @@ function closeForm() {
             </div>
             <div class="mb-2 flex flex-col gap-1">
                 <label class="font-[500] text-[#6c757d]">Products</label>
-
                 <div class="flex w-full gap-2">
                     <select
                         class="w-[60%] border p-[0.7em] rounded-[0.5em] appearance-none focus:outline-none focus:border-blue-500"
                         v-model="newProduct" :disabled="isSubmitting">
                         <option value="" disabled>Select Product</option>
-                        <option v-for="product in 10" :key="product" :value="product">
-                            {{ product }}
+                        <option v-for="prod in products" :key="prod.id" :value="prod.id">
+                            {{ prod.name }}
                         </option>
                     </select>
                     <input type="number" min="1" class="w-[20%] border p-[0.7em] rounded-[0.5em]" placeholder="Qty"
                         v-model="newQty" />
-                    <button @click="addProduct"
+                    <button type="button" @click="addProduct"
                         class="bg-[#023047] px-[1em] py-[0.5em] rounded-[1em] text-[11pt] text-white hover:bg-[#034f6f] transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" height="15px" viewBox="0 -960 960 960" width="15px"
                             fill="#ffffff">
@@ -152,7 +176,7 @@ function closeForm() {
                     <div v-for="(item, index) in productsList" :key="index"
                         class="flex justify-between items-center border p-2 px-3 rounded-lg bg-[#f8f9fa]">
                         <div class="font-medium">
-                            {{ item.name }} (Qty: {{ item.qty }})
+                            {{ getProductName(item.item_id) }} (Qty: {{ item.quantity }})
                         </div>
                         <button @click="removeProduct(index)" class="text-red-500 font-bold text-xl">×</button>
                     </div>

@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from "vue";
+import { createProduct } from "~/services/product";
 const emit = defineEmits(["close", "success"]);
 
 const isSubmitting = ref(false);
 
-// Form fields
 const formData = ref({
     name: "",
     hsn_code: "",
@@ -32,17 +32,14 @@ function validateForm() {
         errors.value.name = "Name is required.";
         isValid = false;
     }
-
     if (!formData.value.hsn_code.trim()) {
         errors.value.hsn_code = "HSN Code is required.";
         isValid = false;
     }
-
     if (!formData.value.unit.trim()) {
         errors.value.unit = "Unit is required.";
         isValid = false;
     }
-
     if (!formData.value.price) {
         errors.value.price = "Price is required.";
         isValid = false;
@@ -50,19 +47,20 @@ function validateForm() {
         errors.value.price = "Please enter a valid price.";
         isValid = false;
     }
-
     return isValid;
 }
 
-async function createProduct() {
+async function productCreation() {
     if (!validateForm()) return;
     isSubmitting.value = true;
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const success = true;
-        if (success) {
-            // Reset form
+        const { data, error } = await createProduct(formData.value);
+        if (error) {
+            alert(error);
+            return;
+        }
+        if (data) {
             formData.value = {
                 name: "",
                 hsn_code: "",
@@ -95,7 +93,7 @@ function closeForm() {
             <button @click="closeForm" class="close-btn text-[20pt] hover:text-gray-600">✕</button>
         </div>
 
-        <form @submit.prevent="createProduct">
+        <form @submit.prevent="productCreation">
             <!-- Product Information -->
             <div class="mb-4">
 
@@ -116,7 +114,8 @@ function closeForm() {
                 <div class="mb-3 flex flex-col gap-1">
                     <label class="font-[500] text-[#6c757d]">Unit *</label>
                     <input class="w-full border p-[0.7em] rounded-[0.5em]" v-model="formData.unit" type="text"
-                        placeholder="Unit (e.g., Kg, Ltr, Pcs)" :disabled="isSubmitting" :class="{ 'error': errors.unit }" />
+                        placeholder="Unit (e.g., Kg, Ltr, Pcs)" :disabled="isSubmitting"
+                        :class="{ 'error': errors.unit }" />
                     <span v-if="errors.unit" class="text-[#ef4444] text-[10pt]">{{ errors.unit }}</span>
                 </div>
 

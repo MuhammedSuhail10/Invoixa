@@ -1,37 +1,33 @@
-import { ref } from 'vue'
 import urls from './urls'
 
-export function login(formData) {
+export async function login(formData) {
     const url = urls.login
-    const data = ref(null)
-    const error = ref(null)
-    const loading = ref(false)
 
-    const execute = async () => {
-        data.value = null
-        error.value = null
-        loading.value = true
-        try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            })
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`)
+    try {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+
+        const json = await res.json()
+        if (!res.ok) {
+            return {
+                data: null,
+                error: `Login failed: ${json?.message || 'Please check your credentials'}`
             }
-            data.value = await res.json()
-            console.log("Values: ", data.value)
-        } catch (e) {
-            error.value = e
-            console.error("Error:", e)
-        } finally {
-            loading.value = false
+        }
+        localStorage.setItem("access", json.access)
+        localStorage.setItem("refresh", json.refresh)
+        localStorage.setItem("name", json.name)
+        return { data: json, error: null }
+    } catch (e) {
+        console.error("Login error:", e)
+        return {
+            data: null,
+            error: 'Network error. Please check your connection and try again.'
         }
     }
-
-    execute()
-    return { data, error, loading }
 }

@@ -1,11 +1,11 @@
 <script setup>
 import { ref } from "vue";
+import { createCustomer } from "~/services/customer";
 const emit = defineEmits(["close", "success"]);
 
 const isSubmitting = ref(false);
 const sameAsAddress = ref(false);
 
-// Form fields
 const formData = ref({
     name: "",
     gst_number: "",
@@ -39,7 +39,6 @@ const errors = ref({
     email: "",
 });
 
-// When checkbox is toggled, copy/clear shipping address
 function handleSameAsAddress() {
     if (sameAsAddress.value) {
         formData.value.shipping_address_line_1 = formData.value.address_line_1;
@@ -71,47 +70,38 @@ function validateForm() {
         phone_number: "",
         email: "",
     };
-
     if (!formData.value.name.trim()) {
         errors.value.name = "Name is required.";
         isValid = false;
     }
-
     if (!formData.value.gst_number.trim()) {
         errors.value.gst_number = "GST Number is required.";
         isValid = false;
     }
-
     if (!formData.value.company_name.trim()) {
         errors.value.company_name = "Company Name is required.";
         isValid = false;
     }
-
     if (!formData.value.address_line_1.trim()) {
         errors.value.address_line_1 = "Address Line 1 is required.";
         isValid = false;
     }
-
     if (!formData.value.city.trim()) {
         errors.value.city = "City is required.";
         isValid = false;
     }
-
     if (!formData.value.state.trim()) {
         errors.value.state = "State is required.";
         isValid = false;
     }
-
     if (!formData.value.pincode.trim()) {
         errors.value.pincode = "Pincode is required.";
         isValid = false;
     }
-
     if (!formData.value.phone_number.trim()) {
         errors.value.phone_number = "Phone Number is required.";
         isValid = false;
     }
-
     if (!formData.value.email.trim()) {
         errors.value.email = "Email is required.";
         isValid = false;
@@ -119,19 +109,19 @@ function validateForm() {
         errors.value.email = "Please enter a valid email address.";
         isValid = false;
     }
-
     return isValid;
 }
 
-async function createCustomer() {
+async function customerCreate() {
     if (!validateForm()) return;
     isSubmitting.value = true;
-
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const success = true;
-        if (success) {
-            // Reset form
+        const { data, error } = await createCustomer(formData.value);
+        if (error) {
+            alert(error);
+            return;
+        }
+        if (data) {
             formData.value = {
                 name: "",
                 gst_number: "",
@@ -150,13 +140,12 @@ async function createCustomer() {
                 shipping_country: "India",
                 phone_number: "",
                 email: "",
+                is_vendor: false,
             };
             sameAsAddress.value = false;
             alert("Customer added successfully!");
             emit("success");
             emit("close");
-        } else {
-            alert("Failed to add customer. Please try again.");
         }
     } catch (err) {
         console.error(err);
@@ -178,10 +167,9 @@ function closeForm() {
             <button @click="closeForm" class="close-btn text-[20pt] hover:text-gray-600">✕</button>
         </div>
 
-        <form @submit.prevent="createCustomer">
+        <form @submit.prevent="customerCreate">
             <div class="flex items-center gap-2 my-[1em]">
-                <input type="checkbox" v-model="formData.is_vendor"
-                    class="w-[1em] h-[1em] accent-blue-500" />
+                <input type="checkbox" v-model="formData.is_vendor" class="w-[1em] h-[1em] accent-blue-500" />
                 <label class="text-[10pt] text-[#6c757d]">Vendor</label>
             </div>
             <!-- Basic Information -->

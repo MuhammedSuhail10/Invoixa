@@ -1,10 +1,43 @@
+<script setup>
+import { ref } from 'vue'
+import { getProduct } from '~/services/product'
+const data = ref(null)
+const error = ref(null)
+const loading = ref(true)
+
+const fetchProducts = async () => {
+    loading.value = true
+    const result = await getProduct()
+    if (result.error) {
+        error.value = result.error
+        data.value = null
+    } else {
+        data.value = result.data
+        error.value = null
+    }
+    loading.value = false
+}
+
+onMounted(() => {
+    fetchProducts();
+})
+</script>
+
 <template>
     <div class="mb-[7em] ">
-        <div v-for="i in 10">
-            <ProductCard>
-                <template #name>Muhammed Suhail</template>
-                <template #hsn>1000</template>
-            </ProductCard>
+        <div v-if="loading" class="text-center py-8">
+            <p>Loading products...</p>
+        </div>
+        <div v-else-if="data && data.length > 0">
+            <div v-for="product in data" :key="product.id">
+                <ProductCard>
+                    <template #name>{{ product.name }}</template>
+                    <template #hsn>{{ product.hsn_code }}</template>
+                </ProductCard>
+            </div>
+        </div>
+        <div v-else class="flex items-center h-[60dvh] justify-center">
+            <p>No products found.</p>
         </div>
     </div>
 </template>
