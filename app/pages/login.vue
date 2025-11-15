@@ -51,7 +51,7 @@ const loginFn = async () => {
         <form @submit.prevent="loginFn" class="my-[3em] px-[1em] ">
             <div>
                 <label class="font-[500] text-[#6c757d]">Phone Number</label>
-                <input class="w-full border p-[0.7em] py-[1em] rounded-[1em] outline-none text-black" 
+                <input class="w-full border p-[0.7em] py-[1em] rounded-[1em] outline-none" 
                     type="text"
                     placeholder="Phone Number" 
                     v-model="phone" 
@@ -59,7 +59,7 @@ const loginFn = async () => {
             </div>
             <div class="mt-[1em]">
                 <label class="font-[500] text-[#6c757d]">Password</label>
-                <input class="w-full border p-[0.7em] py-[1em] rounded-[1em] outline-none text-black" 
+                <input class="w-full border p-[0.7em] py-[1em] rounded-[1em] outline-none" 
                     type="password"
                     placeholder="Password" 
                     v-model="password"
