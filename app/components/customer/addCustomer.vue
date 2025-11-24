@@ -68,7 +68,6 @@ function validateForm() {
         state: "",
         pincode: "",
         phone_number: "",
-        email: "",
     };
     if (!formData.value.name.trim()) {
         errors.value.name = "Name is required.";
@@ -100,13 +99,6 @@ function validateForm() {
     }
     if (!formData.value.phone_number.trim()) {
         errors.value.phone_number = "Phone Number is required.";
-        isValid = false;
-    }
-    if (!formData.value.email.trim()) {
-        errors.value.email = "Email is required.";
-        isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
-        errors.value.email = "Please enter a valid email address.";
         isValid = false;
     }
     return isValid;
@@ -208,9 +200,9 @@ function closeForm() {
                     </div>
 
                     <div class="flex flex-col gap-1">
-                        <label class="font-[500] text-[#6c757d]">Email *</label>
+                        <label class="font-[500] text-[#6c757d]">Email</label>
                         <input class="w-full border p-[0.7em] rounded-[0.5em]" v-model="formData.email" type="email"
-                            placeholder="Email" :disabled="isSubmitting" :class="{ 'error': errors.email }" />
+                            placeholder="Email" :disabled="isSubmitting" />
                         <span v-if="errors.email" class="text-[#ef4444] text-[10pt]">{{ errors.email }}</span>
                     </div>
                 </div>
