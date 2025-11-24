@@ -28,8 +28,8 @@ onMounted(() => {
         <div v-if="loading" class="text-center py-8">
             <p>Loading products...</p>
         </div>
-        <div v-else-if="data && data.length > 0">
-            <div v-for="product in data" :key="product.id">
+        <div v-else-if="data && data.length > 0" class="flex flex-wrap gap-4">
+            <div v-for="product in data" :key="product.id" class="w-[calc(50%-0.5rem)]">
                 <ProductCard>
                     <template #name>{{ product.name }}</template>
                     <template #hsn>{{ product.hsn_code }}</template>

@@ -41,9 +41,9 @@ onMounted(() => {
         <div v-if="loading" class="text-center py-8">
             <p>Loading purchases...</p>
         </div>
-        <div v-else-if="data && data.length > 0">
+        <div v-else-if="data && data.length > 0" class="flex flex-wrap gap-4">
             <div v-for="purchase in data" :key="purchase.id"
-                class="bg-[#e9ecef] my-[1em] rounded-[1em] p-[1em] shadow-2">
+                class="bg-[#e9ecef] w-[calc(50%-0.5rem)] my-[1em] rounded-[1em] p-[1em] shadow-2">
                 <HelpersCard>
                     <template #name>{{ purchase.customer }}</template>
                     <template #date>{{ purchase.order_date }}</template>
