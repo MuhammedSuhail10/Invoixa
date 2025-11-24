@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     injectManifest: {
       globPatterns: ['**/*.{js,css,html,png,svg,ico}']
     },
-    
+
     manifest: {
       name: 'Invoixa',
       short_name: 'Invoixa',
@@ -30,24 +30,29 @@ export default defineNuxtConfig({
       start_url: '/',
       icons: [
         {
-          src: '/icon.png',
-          sizes: '192x192',
-          type: 'image/png',
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
         },
-      ],
+        {
+          "src": "/icon-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     },
-    
+
     workbox: {
       navigateFallback: '/',
       globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
       cleanupOutdatedCaches: true,
       clientsClaim: true,
     },
-    
+
     client: {
       installPrompt: true,
     },
-    
+
     devOptions: {
       enabled: true,
       suppressWarnings: true,  // Added to suppress dev warnings
