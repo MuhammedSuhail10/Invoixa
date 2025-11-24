@@ -31,7 +31,7 @@ onMounted(() => {
             <p>Loading customers...</p>
         </div>
         <div v-else-if="data && data.length > 0" class="flex flex-wrap gap-4">
-            <div v-for="customer in data" :key="customer.id" class="w-[50%]">
+            <div v-for="customer in data" :key="customer.id" class="w-[calc(50%-0.5rem)]">
                 <CustomerCard>
                     <template #name>{{ customer.name }}</template>
                     <template #phone>{{ customer.phone_number }}</template>
